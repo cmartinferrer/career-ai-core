@@ -15,6 +15,19 @@ def default_data_dir() -> Path:
     return Path(configured)
 
 
+def _resolve_data_file(filename: str | Path, data_dir: str | Path | None = None) -> Path:
+    """Resolve a data file without allowing access outside the configured directory."""
+    root = (Path(data_dir) if data_dir is not None else default_data_dir()).resolve()
+    relative_path = Path(filename)
+    if relative_path.is_absolute():
+        raise ValueError(f"Absolute data file paths are not allowed: {filename}")
+
+    file_path = (root / relative_path).resolve()
+    if not file_path.is_relative_to(root):
+        raise ValueError(f"Data file path escapes the configured directory: {filename}")
+    return file_path
+
+
 def load_knowledge(data_dir: str | Path | None = None) -> dict:
     """Load candidate knowledge from a configurable data directory."""
     knowledge = {
@@ -55,7 +68,7 @@ def load_knowledge(data_dir: str | Path | None = None) -> dict:
 def load_yaml(filename: str, data_dir: str | Path | None = None) -> dict:
     """Load a YAML mapping from the configured data directory."""
 
-    file_path = (Path(data_dir) if data_dir is not None else default_data_dir()) / filename
+    file_path = _resolve_data_file(filename, data_dir)
 
     if not file_path.is_file():
         raise FileNotFoundError(f"YAML file not found: {file_path}")
@@ -72,7 +85,7 @@ def load_yaml(filename: str, data_dir: str | Path | None = None) -> dict:
 def load_markdown(filename: str, data_dir: str | Path | None = None) -> str:
     """Load a Markdown document from the configured data directory."""
 
-    file_path = (Path(data_dir) if data_dir is not None else default_data_dir()) / filename
+    file_path = _resolve_data_file(filename, data_dir)
 
     if not file_path.is_file():
         raise FileNotFoundError(f"Markdown file not found: {file_path}")
