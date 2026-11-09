@@ -33,15 +33,11 @@ class CareerAgent:
         self.system_instruction = build_system_instruction(self.knowledge)
 
     def ask(self, question: str, history: list | None = None) -> str:
-        """
-        Envía una pregunta a Gemini incluyendo un historial
-        de conversación limitado según la configuración.
-        """
+        """Send a question to Gemini with the configured amount of chat history."""
 
         contents = []
 
-        # Conservamos únicamente los últimos mensajes.
-        # Si el límite es 0, no enviamos historial.
+        # A zero history limit disables conversational context.
         recent_history = (history or [])[-MAX_HISTORY_MESSAGES:] if MAX_HISTORY_MESSAGES > 0 else []
 
         for message in recent_history:
@@ -51,8 +47,7 @@ class CareerAgent:
             if role not in ("user", "assistant"):
                 continue
 
-            # Gradio puede devolver texto directamente
-            # o una lista de bloques de contenido.
+            # Gradio may return plain text or structured content blocks.
             if isinstance(content, str):
                 text = content
 
@@ -78,7 +73,7 @@ class CareerAgent:
                 )
             )
 
-        # Añadimos la pregunta actual.
+        # Append the current question after the conversation history.
         contents.append(
             types.Content(
                 role="user",

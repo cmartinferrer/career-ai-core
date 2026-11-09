@@ -2,9 +2,7 @@ from career_ai_core.models import Skill
 
 
 def build_skill_index(skills_data: dict) -> dict:
-    """
-    Construye un índice de tecnologías por ID.
-    """
+    """Build a lookup of skills keyed by their identifiers."""
 
     return {
         skill["id"]: skill for category in skills_data["categories"] for skill in category["skills"]
@@ -12,18 +10,13 @@ def build_skill_index(skills_data: dict) -> dict:
 
 
 def resolve_skills(skill_ids: list[str], skill_index: dict) -> list[dict]:
-    """
-    Obtiene los datos completos de cada tecnología.
-    """
+    """Resolve skill identifiers to independent skill dictionaries."""
 
     return [skill_index[skill_id].copy() for skill_id in skill_ids]
 
 
 def validate_skills(skills_data: dict) -> dict:
-    """
-    Valida todas las tecnologías mediante Pydantic
-    y devuelve los datos en formato diccionario.
-    """
+    """Validate skills with Pydantic and return normalized dictionaries."""
 
     validated_data = {
         **skills_data,

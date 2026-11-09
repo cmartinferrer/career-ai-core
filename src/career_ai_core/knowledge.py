@@ -23,30 +23,27 @@ def load_knowledge(data_dir: str | Path | None = None) -> dict:
         "skills": load_yaml("skills.yaml", data_dir),
     }
 
-    # Validación de estructura y tipos con Pydantic
+    # Validate skill data with Pydantic.
     knowledge["skills"] = validate_skills(knowledge["skills"])
 
-    # Validamos las referencias antes de resolverlas
+    # Validate skill references before resolving them.
     validate_skill_references(knowledge)
 
-    # Construimos el índice de tecnologías
+    # Index skills by ID for efficient lookups.
     skill_index = build_skill_index(knowledge["skills"])
 
     for company in knowledge["experience"]["experiences"]:
-        # Tecnologías de la empresa
         company["resolved_skills"] = resolve_skills(
             company.get("skill_ids", []),
             skill_index,
         )
 
         for project in company.get("projects", []):
-            # Tecnologías del proyecto
             project["resolved_skills"] = resolve_skills(
                 project.get("skill_ids", []),
                 skill_index,
             )
 
-            # Documentación Markdown
             details_file = project.get("details_file")
 
             if details_file:
@@ -56,7 +53,7 @@ def load_knowledge(data_dir: str | Path | None = None) -> dict:
 
 
 def load_yaml(filename: str, data_dir: str | Path | None = None) -> dict:
-    """Carga un fichero YAML desde el directorio data."""
+    """Load a YAML mapping from the configured data directory."""
 
     file_path = (Path(data_dir) if data_dir is not None else default_data_dir()) / filename
 
@@ -73,7 +70,7 @@ def load_yaml(filename: str, data_dir: str | Path | None = None) -> dict:
 
 
 def load_markdown(filename: str, data_dir: str | Path | None = None) -> str:
-    """Carga un documento Markdown desde data/."""
+    """Load a Markdown document from the configured data directory."""
 
     file_path = (Path(data_dir) if data_dir is not None else default_data_dir()) / filename
 
