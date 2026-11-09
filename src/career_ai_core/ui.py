@@ -1,4 +1,6 @@
+import json
 import os
+from html import escape
 
 import gradio as gr
 
@@ -11,6 +13,7 @@ from career_ai_core.config import (
     MAX_REQUESTS,
     rate_limit_period_text,
 )
+from career_ai_core.i18n import configured_locale, get_translations
 from career_ai_core.rate_limiter import rate_limiter
 from career_ai_core.styles import CUSTOM_CSS
 from career_ai_core.voice import VOICE_JS
@@ -34,21 +37,32 @@ def respond(
     visitor_id = request.client.host if request.client else "unknown"
 
     if not rate_limiter.allow(visitor_id):
-        return (
-            f"Has alcanzado el límite de {MAX_REQUESTS} "
-            f"consultas cada {rate_limit_period_text()}. "
-            "Por favor, vuelve a intentarlo más tarde."
+        messages = get_translations(configured_locale())
+        return messages["rate_limit_message"].format(
+            max_requests=MAX_REQUESTS, period=rate_limit_period_text()
         )
 
     return get_agent().ask(message, history)
 
 
 def launch_app() -> None:
+    locale = configured_locale()
+    messages = get_translations(locale)
     current_agent = get_agent()
     experiences = current_agent.knowledge["experience"]["experiences"]
     profile = current_agent.knowledge["profile"]
     personal = profile.get("personal") or {}
     candidate_name = str(personal.get("name") or "Candidate")
+
+    tooltip_css = "\n".join(
+        f"#chat-panel {{ --{key}: {json.dumps(messages[value], ensure_ascii=False)}; }}"
+        for key, value in (
+            ("voice-disable", "voice_disable"),
+            ("voice-enable", "voice_enable"),
+            ("voice-replay", "voice_replay"),
+            ("voice-stop", "voice_stop"),
+        )
+    )
 
     with gr.Blocks(
         title=f"{candidate_name} | Career AI",
@@ -59,7 +73,7 @@ def launch_app() -> None:
         with gr.Row(equal_height=False):
             # Professional experience sidebar
             with gr.Column(scale=1, min_width=240):
-                gr.HTML(render_compact_experience(experiences))
+                gr.HTML(render_compact_experience(experiences, locale=locale))
 
             # Chat panel
             with gr.Column(
@@ -78,9 +92,9 @@ def launch_app() -> None:
                         gr.HTML(
                             '<div class="chat-toolbar-title">'
                             '<div class="sidebar-heading">'
-                            "ASISTENTE IA"
-                            "</div>"
-                            "</div>"
+                            + escape(messages["assistant_heading"])
+                            + "</div>"
+                            + "</div>"
                         )
 
                     with gr.Row(
@@ -117,20 +131,17 @@ def launch_app() -> None:
                 # Chat interface
                 chatbot = gr.Chatbot(
                     height=565,
-                    placeholder=(
-                        f"👋 ¡Hola! Soy el asistente profesional de {candidate_name}. "
-                        "Pregúntame sobre sus proyectos, tecnologías o experiencia."
-                    ),
+                    placeholder=messages["assistant_welcome"].format(candidate_name=candidate_name),
                 )
 
                 gr.ChatInterface(
                     fn=respond,
                     chatbot=chatbot,
                     examples=[
-                        "¿Cuál es su experiencia profesional?",
-                        "¿Qué proyectos ha desarrollado?",
-                        "¿Qué habilidades técnicas tiene?",
-                        "¿Qué formación tiene?",
+                        messages["example_experience"],
+                        messages["example_projects"],
+                        messages["example_skills"],
+                        messages["example_education"],
                     ],
                 )
 
@@ -145,6 +156,8 @@ def launch_app() -> None:
                 )
 
                 # Enable / disable automatic playback
+                voice_on = json.dumps(messages["voice_disable"], ensure_ascii=False)
+                voice_off = json.dumps(messages["voice_enable"], ensure_ascii=False)
                 auto_button.click(
                     fn=None,
                     inputs=[],
@@ -173,8 +186,8 @@ def launch_app() -> None:
                             button.setAttribute(
                                 "title",
                                 enabled
-                                    ? "Desactivar la lectura automática"
-                                    : "Activar la lectura automática"
+                                    ? __VOICE_ON__
+                                    : __VOICE_OFF__
                             );
                         }
 
@@ -187,7 +200,7 @@ def launch_app() -> None:
                             "voice-auto-off",
                             !enabled
                         );
-                    }""",
+                    }""".replace("__VOICE_ON__", voice_on).replace("__VOICE_OFF__", voice_off),
                 )
 
                 # Replay the latest assistant response
@@ -209,7 +222,7 @@ def launch_app() -> None:
     demo.launch(
         server_name="0.0.0.0",
         server_port=int(os.getenv("PORT", "7860")),
-        css=CUSTOM_CSS,
+        css=CUSTOM_CSS + "\n" + tooltip_css,
     )
 
 

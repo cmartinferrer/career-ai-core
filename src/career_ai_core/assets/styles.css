@@ -281,19 +281,19 @@
 }
 
 #auto-voice-button.voice-auto-on::after {
-    content: "Desactivar lectura automática";
+    content: var(--voice-disable);
 }
 
 #auto-voice-button.voice-auto-off::after {
-    content: "Activar lectura automática";
+    content: var(--voice-enable);
 }
 
 #replay-voice-button::after {
-    content: "Escuchar la última respuesta";
+    content: var(--voice-replay);
 }
 
 #stop-voice-button::after {
-    content: "Detener la reproducción";
+    content: var(--voice-stop);
 }
 
 #auto-voice-button:hover::after,

@@ -9,19 +9,27 @@ MAX_REQUESTS = int(os.getenv("MAX_REQUESTS", "20"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "3600"))
 
 
-def rate_limit_period_text() -> str:
+def rate_limit_period_text(locale: str | None = None) -> str:
+    from career_ai_core.i18n import configured_locale, get_translations
+
+    messages = get_translations(locale or configured_locale())
+
+    def plural(unit: str, count: int) -> str:
+        word = messages[f"period_{unit}"]
+        return f"{count} {word}" if count == 1 else f"{count} {word}s"
+
     seconds = RATE_LIMIT_WINDOW_SECONDS
 
     if seconds % 86400 == 0:
         days = seconds // 86400
-        return f"{days} día" if days == 1 else f"{days} días"
+        return plural("day", days)
 
     if seconds % 3600 == 0:
         hours = seconds // 3600
-        return f"{hours} hora" if hours == 1 else f"{hours} horas"
+        return plural("hour", hours)
 
     if seconds % 60 == 0:
         minutes = seconds // 60
-        return f"{minutes} minuto" if minutes == 1 else f"{minutes} minutos"
+        return plural("minute", minutes)
 
-    return f"{seconds} segundos"
+    return plural("second", seconds)

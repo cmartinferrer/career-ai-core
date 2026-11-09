@@ -1,5 +1,7 @@
 from html import escape
 
+from career_ai_core.i18n import configured_locale, get_translations
+
 
 def _presentation(profile: dict) -> tuple[str, str, str, list[str]]:
     """Resolve candidate-facing UI text without embedding personal information."""
@@ -36,7 +38,8 @@ def render_tech_stack(profile: dict) -> str:
     return f'<div class="profile-grid">{cards}</div>'
 
 
-def render_experience(experiences: list) -> str:
+def render_experience(experiences: list, locale: str | None = None) -> str:
+    messages = get_translations(locale or configured_locale())
     companies = []
 
     for experience in experiences:
@@ -54,7 +57,7 @@ def render_experience(experiences: list) -> str:
 
     return (
         '<div class="experience-section">'
-        "<h2>Trayectoria profesional</h2>"
+        f"<h2>{escape(messages['career_section_title'])}</h2>"
         '<div class="experience-grid">' + "".join(companies) + "</div></div>"
     )
 
@@ -74,7 +77,8 @@ def render_compact_header(profile: dict) -> str:
     )
 
 
-def render_compact_experience(experiences: list) -> str:
+def render_compact_experience(experiences: list, locale: str | None = None) -> str:
+    messages = get_translations(locale or configured_locale())
     items = []
 
     for experience in experiences:
@@ -84,7 +88,7 @@ def render_compact_experience(experiences: list) -> str:
         period = experience.get("period") or {}
         start = str(period.get("start") or "")[:4]
         end_value = period.get("end")
-        end = str(end_value)[:4] if end_value else "Actualidad"
+        end = str(end_value)[:4] if end_value else messages["current_position"]
 
         projects = experience.get("projects") or []
 
@@ -93,7 +97,7 @@ def render_compact_experience(experiences: list) -> str:
         )
 
         projects_html = (
-            f'<p class="career-project-names"><strong>Proyectos:</strong> {project_names}</p>'
+            f"<p class='career-project-names'><strong>{escape(messages['projects_label'])}</strong> {project_names}</p>"
             if project_names
             else ""
         )
@@ -115,7 +119,7 @@ def render_compact_experience(experiences: list) -> str:
                     <p>{escape(str(experience.get("description", "")))}</p>
                     {projects_html}
                     <div class="career-chat-hint">
-                        ✦ ¿Quieres saber más? Pregunta al asistente IA.
+                        {escape(messages["career_chat_hint"])}
                     </div>
                 </div>
             </details>
@@ -123,5 +127,7 @@ def render_compact_experience(experiences: list) -> str:
 
     return (
         '<div class="career-sidebar">'
-        '<div class="sidebar-heading">TRAYECTORIA PROFESIONAL</div>' + "".join(items) + "</div>"
+        f'<div class="sidebar-heading">{escape(messages["career_heading"])}</div>'
+        + "".join(items)
+        + "</div>"
     )

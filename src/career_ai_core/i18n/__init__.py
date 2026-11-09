@@ -1,5 +1,6 @@
 """Translations for candidate-facing interface copy."""
 
+import os
 from collections.abc import Mapping
 from types import MappingProxyType
 
@@ -24,3 +25,10 @@ def get_translations(locale: str = "en") -> Mapping[str, str]:
         raise ValueError(
             f"Unsupported locale: {locale!r}. Supported locales: {', '.join(SUPPORTED_LOCALES)}"
         ) from exc
+
+
+def configured_locale() -> str:
+    """Resolve the owner-selected locale at runtime."""
+    locale = os.getenv("CAREER_AI_LOCALE", "en")
+    get_translations(locale)
+    return locale
