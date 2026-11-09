@@ -21,4 +21,9 @@ MESSAGES = {
     "voice_enable": "Enable automatic reading",
     "voice_replay": "Listen to the latest response",
     "voice_stop": "Stop playback",
+    "assistant_empty_response": "I could not generate a response. Please rephrase your question.",
+    "assistant_quota_error": "The assistant has temporarily reached its usage limit. Please try again later.",
+    "assistant_unavailable": "The AI service is currently unavailable. Please try again in a few minutes.",
+    "assistant_request_error": "Your request could not be processed. Please try again later.",
+    "assistant_unexpected_error": "An unexpected error occurred. Please try again later.",
 }

@@ -10,6 +10,7 @@ from career_ai_core.config import (
     MAX_HISTORY_MESSAGES,
     MAX_OUTPUT_TOKENS,
 )
+from career_ai_core.i18n import configured_locale, get_translations
 from career_ai_core.knowledge import load_knowledge
 from career_ai_core.prompts import build_system_instruction
 
@@ -35,6 +36,7 @@ class CareerAgent:
     def ask(self, question: str, history: list | None = None) -> str:
         """Send a question to Gemini with the configured amount of chat history."""
 
+        messages = get_translations(configured_locale())
         contents = []
 
         # A zero history limit disables conversational context.
@@ -103,10 +105,7 @@ class CareerAgent:
                 finish_reason,
             )
 
-            return (
-                response.text
-                or "No he podido generar una respuesta. Por favor, intenta reformular tu pregunta."
-            )
+            return response.text or messages["assistant_empty_response"]
 
         except errors.APIError as exc:
             logger.warning(
@@ -115,22 +114,14 @@ class CareerAgent:
             )
 
             if exc.code == 429:
-                return (
-                    "El asistente ha alcanzado temporalmente "
-                    "su límite de uso. Por favor, inténtalo "
-                    "más tarde."
-                )
+                return messages["assistant_quota_error"]
 
             if exc.code in (500, 502, 503, 504):
-                return (
-                    "El servicio de IA no está disponible "
-                    "en este momento. Por favor, vuelve "
-                    "a intentarlo dentro de unos minutos."
-                )
+                return messages["assistant_unavailable"]
 
-            return "No se ha podido procesar tu consulta. Por favor, inténtalo más tarde."
+            return messages["assistant_request_error"]
 
         except Exception:
             logger.exception("Unexpected error while requesting Gemini")
 
-            return "Se ha producido un error inesperado. Por favor, vuelve a intentarlo más tarde."
+            return messages["assistant_unexpected_error"]

@@ -21,4 +21,9 @@ MESSAGES = {
     "voice_enable": "Activar lectura automática",
     "voice_replay": "Escuchar la última respuesta",
     "voice_stop": "Detener la reproducción",
+    "assistant_empty_response": "No he podido generar una respuesta. Por favor, intenta reformular tu pregunta.",
+    "assistant_quota_error": "El asistente ha alcanzado temporalmente su límite de uso. Por favor, inténtalo más tarde.",
+    "assistant_unavailable": "El servicio de IA no está disponible en este momento. Por favor, vuelve a intentarlo dentro de unos minutos.",
+    "assistant_request_error": "No se ha podido procesar tu consulta. Por favor, inténtalo más tarde.",
+    "assistant_unexpected_error": "Se ha producido un error inesperado. Por favor, vuelve a intentarlo más tarde.",
 }
