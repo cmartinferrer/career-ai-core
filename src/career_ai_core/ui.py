@@ -36,7 +36,10 @@ def respond(
 ) -> str:
     visitor_id = request.client.host if request.client else "unknown"
 
-    if not rate_limiter.allow(visitor_id):
+    rejection = rate_limiter.check(visitor_id)
+    if rejection == "global":
+        return get_translations(configured_locale())["global_daily_limit_message"]
+    if rejection == "visitor":
         messages = get_translations(configured_locale())
         return messages["rate_limit_message"].format(
             max_requests=MAX_REQUESTS, period=rate_limit_period_text()

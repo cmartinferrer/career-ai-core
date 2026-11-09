@@ -7,6 +7,7 @@ MESSAGES = {
     "current_position": "Present",
     "projects_label": "Projects:",
     "career_chat_hint": "✦ Want to know more? Ask the AI assistant.",
+    "global_daily_limit_message": "The assistant has reached its daily request limit. Please try again tomorrow.",
     "rate_limit_message": "You have reached the limit of {max_requests} requests per {period}. Please try again later.",
     "period_day": "day",
     "period_hour": "hour",

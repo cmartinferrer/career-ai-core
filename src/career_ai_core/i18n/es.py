@@ -7,6 +7,7 @@ MESSAGES = {
     "current_position": "Actualidad",
     "projects_label": "Proyectos:",
     "career_chat_hint": "✦ ¿Quieres saber más? Pregunta al asistente IA.",
+    "global_daily_limit_message": "El asistente ha alcanzado su límite diario de consultas. Vuelve a intentarlo mañana.",
     "rate_limit_message": "Has alcanzado el límite de {max_requests} consultas cada {period}. Por favor, vuelve a intentarlo más tarde.",
     "period_day": "día",
     "period_hour": "hora",
