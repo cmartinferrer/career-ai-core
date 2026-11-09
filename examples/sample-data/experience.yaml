@@ -1,0 +1,8 @@
+experiences:
+  - company: "Example Technologies"
+    role: "Software Engineer"
+    period:
+      start: "2022-01"
+      end: null
+    skill_ids: []
+    projects: []

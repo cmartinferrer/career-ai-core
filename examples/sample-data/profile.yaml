@@ -1,0 +1,7 @@
+personal:
+  name: "Alex Example"
+  title: "Software Engineer"
+  summary: "Engineer specializing in backend services."
+presentation:
+  tagline: "Software Engineer · Backend Systems"
+  highlights: ["Python", "APIs"]
