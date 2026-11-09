@@ -24,3 +24,5 @@ wheels/
 .DS_Store
 .vscode/
 debug_knowledge.py
+# Local sample data copied by the README quick start
+/local-data/

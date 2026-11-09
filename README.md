@@ -199,4 +199,6 @@ The application starts a Gradio server and reads its port from `PORT`, which mak
 
 ## License and contributions
 
-A license and contribution guidelines will be added before the public release. Until then, do not assume the project is licensed for unrestricted reuse.
+Career AI Core is licensed under the [MIT License](LICENSE).
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
