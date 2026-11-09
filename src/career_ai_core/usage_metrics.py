@@ -1,8 +1,12 @@
 """Process-local, thread-safe Gemini usage counters (UTC daily buckets)."""
 
+import logging
+import os
 import threading
 from datetime import datetime, timezone
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 class UsageMetrics:
@@ -49,6 +53,7 @@ class UsageMetrics:
             else input_tokens + output_tokens
         )
 
+        report = None
         with self._lock:
             if self._day != today:
                 self._day = today
@@ -66,6 +71,34 @@ class UsageMetrics:
                     bucket["failed_input_tokens"] += input_tokens
                     bucket["failed_output_tokens"] += output_tokens
                     bucket["failed_total_tokens"] += total_tokens
+            # Logging is opt-in and only includes aggregate counters.
+            interval = self._report_interval()
+            if interval > 0 and self._totals["requests"] % interval == 0:
+                report = (today, self._daily.copy())
+
+        if report is not None:
+            day, counts = report
+            logger.info(
+                "Gemini usage summary: date_utc=%s requests=%d successful=%d "
+                "failed=%d input_tokens=%d output_tokens=%d total_tokens=%d "
+                "requests_without_usage=%d",
+                day,
+                counts["requests"],
+                counts["successful_requests"],
+                counts["failed_requests"],
+                counts["input_tokens"],
+                counts["output_tokens"],
+                counts["total_tokens"],
+                counts["requests_without_usage"],
+            )
+
+    @staticmethod
+    def _report_interval() -> int:
+        """Return the optional log cadence; invalid values disable reporting."""
+        try:
+            return max(0, int(os.getenv("GEMINI_USAGE_LOG_EVERY", "0")))
+        except ValueError:
+            return 0
 
     def snapshot(self) -> dict[str, Any]:
         """Return detached counters for monitoring (no user or prompt content)."""
