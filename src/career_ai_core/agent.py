@@ -13,6 +13,7 @@ from career_ai_core.config import (
 from career_ai_core.i18n import configured_locale, get_translations
 from career_ai_core.knowledge import load_knowledge
 from career_ai_core.prompts import build_system_instruction
+from career_ai_core.usage_metrics import usage_metrics
 
 load_dotenv()
 
@@ -94,7 +95,8 @@ class CareerAgent:
                 ),
             )
 
-            usage = response.usage_metadata
+            usage = getattr(response, "usage_metadata", None)
+            usage_metrics.record(success=True, usage=usage)
             finish_reason = response.candidates[0].finish_reason if response.candidates else None
 
             logger.debug(
@@ -108,6 +110,7 @@ class CareerAgent:
             return response.text or messages["assistant_empty_response"]
 
         except errors.APIError as exc:
+            usage_metrics.record(success=False)
             logger.warning(
                 "Gemini API error: status=%s",
                 exc.code,
@@ -122,6 +125,7 @@ class CareerAgent:
             return messages["assistant_request_error"]
 
         except Exception:
+            usage_metrics.record(success=False)
             # Exception messages may contain request details or provider diagnostics.
             logger.error("Unexpected error while requesting Gemini (details suppressed)")
 
