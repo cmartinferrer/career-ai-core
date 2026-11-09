@@ -14,6 +14,6 @@ class Skill(BaseModel):
     @classmethod
     def validate_not_blank(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("El campo no puede estar vacío")
+            raise ValueError("Field must not be blank")
 
         return value.strip()

@@ -14,13 +14,13 @@ def validate_skill_references(knowledge: dict) -> None:
         """Collect unresolved skill references for a company or project."""
         for skill_id in entity.get("skill_ids", []):
             if skill_id not in valid_skill_ids:
-                errors.append(f"{entity_name}: skill desconocida '{skill_id}'")
+                errors.append(f"{entity_name}: unknown skill '{skill_id}'")
 
     for company in experience["experiences"]:
-        check_references(company, f"Empresa '{company['company']}'")
+        check_references(company, f"Company '{company['company']}'")
 
         for project in company.get("projects", []):
-            check_references(project, f"Proyecto '{project['name']}'")
+            check_references(project, f"Project '{project['name']}'")
 
     if errors:
-        raise ValueError("Errores de validación:\n" + "\n".join(errors))
+        raise ValueError("Skill reference validation failed:\n" + "\n".join(errors))

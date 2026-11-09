@@ -58,13 +58,13 @@ def load_yaml(filename: str, data_dir: str | Path | None = None) -> dict:
     file_path = (Path(data_dir) if data_dir is not None else default_data_dir()) / filename
 
     if not file_path.is_file():
-        raise FileNotFoundError(f"No se encuentra el fichero: {file_path}")
+        raise FileNotFoundError(f"YAML file not found: {file_path}")
 
     with file_path.open("r", encoding="utf-8") as file:
         data = yaml.safe_load(file)
 
     if not isinstance(data, dict):
-        raise ValueError(f"El fichero {filename} debe contener un objeto YAML.")
+        raise ValueError(f"YAML file {filename} must contain a mapping.")
 
     return data
 
@@ -75,6 +75,6 @@ def load_markdown(filename: str, data_dir: str | Path | None = None) -> str:
     file_path = (Path(data_dir) if data_dir is not None else default_data_dir()) / filename
 
     if not file_path.is_file():
-        raise FileNotFoundError(f"No se encuentra el documento: {file_path}")
+        raise FileNotFoundError(f"Markdown file not found: {file_path}")
 
     return file_path.read_text(encoding="utf-8")
