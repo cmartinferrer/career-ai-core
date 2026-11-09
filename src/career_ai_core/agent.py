@@ -24,7 +24,7 @@ class CareerAgent:
         api_key = os.getenv("GOOGLE_API_KEY")
 
         if not api_key:
-            raise ValueError("No se ha configurado GOOGLE_API_KEY en .env")
+            raise ValueError("GOOGLE_API_KEY is not configured")
 
         self.client = genai.Client(api_key=api_key)
         self.model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
@@ -122,6 +122,7 @@ class CareerAgent:
             return messages["assistant_request_error"]
 
         except Exception:
-            logger.exception("Unexpected error while requesting Gemini")
+            # Exception messages may contain request details or provider diagnostics.
+            logger.error("Unexpected error while requesting Gemini (details suppressed)")
 
             return messages["assistant_unexpected_error"]
