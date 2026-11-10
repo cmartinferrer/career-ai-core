@@ -1,11 +1,10 @@
 """Reusable system prompt for a candidate's conversational CV."""
 
 import json
-from collections.abc import Mapping
 from typing import Any
 
 
-def build_system_instruction(knowledge: Mapping[str, Any]) -> str:
+def build_system_instruction(knowledge: dict[str, Any]) -> str:
     """Build instructions from candidate data, without hard-coded identity."""
     profile = knowledge.get("profile")
     if not isinstance(profile, dict):

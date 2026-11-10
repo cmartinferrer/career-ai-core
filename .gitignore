@@ -26,3 +26,9 @@ wheels/
 debug_knowledge.py
 # Local sample data copied by the README quick start
 /local-data/
+
+# Test coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml

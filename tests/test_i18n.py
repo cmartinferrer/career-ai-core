@@ -2,7 +2,7 @@
 
 import pytest
 
-from career_ai_core.i18n import SUPPORTED_LOCALES, get_translations
+from career_ai_core.i18n import SUPPORTED_LOCALES, configured_locale, get_translations
 
 
 def test_default_locale_is_english():
@@ -30,3 +30,36 @@ def test_unsupported_locale_is_rejected():
 def test_catalog_cannot_be_mutated():
     with pytest.raises(TypeError):
         get_translations("es")["assistant_heading"] = "Changed"
+
+
+@pytest.mark.parametrize("locale", ["en", "es"])
+def test_agent_error_translations_are_available(locale):
+    messages = get_translations(locale)
+    for key in (
+        "assistant_empty_response",
+        "assistant_quota_error",
+        "assistant_unavailable",
+        "assistant_request_error",
+        "assistant_unexpected_error",
+    ):
+        assert isinstance(messages[key], str)
+        assert messages[key].strip()
+
+
+def test_english_is_default(monkeypatch):
+    monkeypatch.delenv("CAREER_AI_LOCALE", raising=False)
+    assert configured_locale() == "en"
+
+
+def test_owner_can_select_spanish(monkeypatch):
+    monkeypatch.setenv("CAREER_AI_LOCALE", "es")
+    assert configured_locale() == "es"
+    assert get_translations(configured_locale())["assistant_heading"] == "ASISTENTE IA"
+
+
+def test_invalid_owner_locale_fails_fast(monkeypatch):
+    import pytest
+
+    monkeypatch.setenv("CAREER_AI_LOCALE", "fr")
+    with pytest.raises(ValueError, match="Unsupported locale"):
+        configured_locale()
