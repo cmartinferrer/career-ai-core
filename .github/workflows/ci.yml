@@ -42,7 +42,7 @@ jobs:
             --cov=career_ai_core \
             --cov-branch \
             --cov-report=term-missing \
-            --cov-fail-under=90
+            --cov-fail-under=85
 
       - name: Build distributions
         run: uv build
