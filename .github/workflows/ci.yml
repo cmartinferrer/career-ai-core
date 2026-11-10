@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 permissions:
@@ -35,8 +36,13 @@ jobs:
       - name: Check formatting
         run: uv run --frozen ruff format --check .
 
-      - name: Run tests
-        run: uv run --frozen pytest -q
+      - name: Run tests with branch coverage
+        run: |
+          uv run --frozen pytest -q \
+            --cov=career_ai_core \
+            --cov-branch \
+            --cov-report=term-missing \
+            --cov-fail-under=90
 
       - name: Build distributions
         run: uv build
