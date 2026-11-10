@@ -10,6 +10,18 @@ from career_ai_core.styles import load_styles
 from career_ai_core.voice import load_voice_js
 
 
+def load_verify_distribution():
+    script_path = Path(__file__).resolve().parents[1] / "scripts" / "verify_distribution.py"
+
+    spec = importlib.util.spec_from_file_location("verify_distribution", script_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Cannot load distribution verification script")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_packaged_assets_are_readable() -> None:
     assert load_styles().strip()
     assert "<script>" in load_voice_js()
@@ -45,15 +57,3 @@ def test_wheel_verification_accepts_complete_wheel(tmp_path: Path) -> None:
             archive.writestr(name, "example\n")
         archive.writestr("career_ai_core-0.1.0.dist-info/entry_points.txt", "[console_scripts]\n")
     verify_wheel(wheel)
-
-
-def load_verify_distribution():
-    script_path = Path(__file__).resolve().parents[1] / "scripts" / "verify_distribution.py"
-
-    spec = importlib.util.spec_from_file_location("verify_distribution", script_path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError("Cannot load distribution verification script")
-
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
